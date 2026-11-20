@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interest Calculator</title>
+    <meta
+      name="description"
+      content="A self-contained simple and compound interest calculator supporting 13 currencies, exact date ranges, and automatic light and dark modes."
+    />
+    <meta property="og:title" content="Interest Calculator" />
+    <meta
+      property="og:description"
+      content="A self-contained simple and compound interest calculator supporting 13 currencies, exact date ranges, and automatic light and dark modes."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg-canvas: #eef2ff;
+        --bg-canvas-gradient: radial-gradient(circle at 12% 14%, rgba(99, 102, 241, 0.22) 0%, transparent 46%),
+          radial-gradient(circle at 88% 18%, rgba(236, 72, 153, 0.18) 0%, transparent 44%),
+          radial-gradient(circle at 78% 86%, rgba(16, 185, 129, 0.18) 0%, transparent 46%),
+          radial-gradient(circle at 18% 85%, rgba(245, 158, 11, 0.16) 0%, transparent 42%),
+          linear-gradient(160deg, #f5f7ff 0%, #fdf2f8 52%, #ecfdf5 100%);
+        --bg-card: rgba(255, 255, 255, 0.96);
+        --bg-subtle: #f5f3ff;
+        --bg-adornment-currency: #eef2ff;
+        --text-adornment-currency: #4338ca;
+        --bg-adornment-rate: #fffbeb;
+        --text-adornment-rate: #b45309;
+        --bg-highlight: linear-gradient(135deg, #eef2ff 0%, #ecfdf5 55%, #fdf2f8 100%);
+        --bg-highlight-flash: linear-gradient(135deg, #e0e7ff 0%, #d1fae5 55%, #fce7f3 100%);
+        --bg-formula: rgba(255, 255, 255, 0.72);
+        --bg-input: #ffffff;
+        --bg-segment: #eef2ff;
+        --bg-segment-active: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%);
+        --text-segment-active: #ffffff;
+        --border-subtle: #e0e7ff;
+        --border-strong: #c7d2fe;
+        --border-highlight: #a5b4fc;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --accent: #4338ca;
+        --accent-gradient: linear-gradient(135deg, #4338ca 0%, #7c3aed 52%, #be185d 100%);
+        --accent-gradient-hover: linear-gradient(135deg, #3730a3 0%, #6d28d9 52%, #9d174d 100%);
+        --accent-text: #ffffff;
+        --color-total: #047857;
+        --color-interest: #6d28d9;
+        --color-principal: #1d4ed8;
+        --color-period: #b45309;
+        --bar-principal: linear-gradient(90deg, #2563eb, #4f46e5);
+        --bar-interest: linear-gradient(90deg, #10b981, #8b5cf6);
+        --bar-track: #e2e8f0;
+        --focus-ring: rgba(99, 102, 241, 0.28);
+        --error-text: #b91c1c;
+        --error-border: #dc2626;
+        --error-bg: #fef2f2;
+        --shadow-card: 0 4px 12px rgba(67, 56, 202, 0.08), 0 24px 48px -16px rgba(124, 58, 237, 0.16);
+        --shadow-btn: 0 6px 18px -6px rgba(109, 40, 217, 0.55);
+        --shadow-segment: 0 2px 6px rgba(67, 56, 202, 0.3);
+        --radius-card: 18px;
+        --radius-control: 10px;
+        --radius-segment: 8px;
+        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Plus Jakarta Sans", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg-canvas: #090d1a;
+          --bg-canvas-gradient: radial-gradient(circle at 14% 16%, rgba(99, 102, 241, 0.26) 0%, transparent 45%),
+            radial-gradient(circle at 86% 14%, rgba(236, 72, 153, 0.2) 0%, transparent 42%),
+            radial-gradient(circle at 80% 85%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+            radial-gradient(circle at 15% 86%, rgba(245, 158, 11, 0.14) 0%, transparent 42%),
+            linear-gradient(160deg, #090d1a 0%, #121026 55%, #0a191f 100%);
+          --bg-card: rgba(17, 22, 41, 0.94);
+          --bg-subtle: #1a213d;
+          --bg-adornment-currency: #1e2749;
+          --text-adornment-currency: #a5b4fc;
+          --bg-adornment-rate: #2b2114;
+          --text-adornment-rate: #fbbf24;
+          --bg-highlight: linear-gradient(135deg, rgba(49, 46, 129, 0.42) 0%, rgba(6, 78, 59, 0.38) 55%, rgba(112, 26, 117, 0.35) 100%);
+          --bg-highlight-flash: linear-gradient(135deg, rgba(67, 56, 202, 0.56) 0%, rgba(4, 120, 87, 0.5) 55%, rgba(157, 23, 77, 0.45) 100%);
+          --bg-formula: rgba(11, 15, 29, 0.62);
+          --bg-input: #0e1326;
+          --bg-segment: #0e1326;
+          --bg-segment-active: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+          --text-segment-active: #ffffff;
+          --border-subtle: #262f52;
+          --border-strong: #374372;
+          --border-highlight: #4c51bf;
+          --text-primary: #f8fafc;
+          --text-secondary: #cbd5e1;
+          --text-muted: #94a3b8;
+          --accent: #818cf8;
+          --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+          --accent-gradient-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #be185d 100%);
+          --accent-text: #ffffff;
+          --color-total: #34d399;
+          --color-interest: #c084fc;
+          --color-principal: #60a5fa;
+          --color-period: #fbbf24;
+          --bar-principal: linear-gradient(90deg, #3b82f6, #6366f1);
+          --bar-interest: linear-gradient(90deg, #10b981, #c084fc);
+          --bar-track: #1e293b;
+          --focus-ring: rgba(129, 140, 248, 0.34);
+          --error-text: #fca5a5;
+          --error-border: #f87171;
+          --error-bg: rgba(127, 29, 29, 0.32);
+          --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.45), 0 24px 56px -16px rgba(79, 70, 229, 0.28);
+          --shadow-btn: 0 8px 22px -6px rgba(219, 39, 119, 0.55);
+          --shadow-segment: 0 2px 8px rgba(124, 58, 237, 0.45);
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--text-primary);
+        background-color: var(--bg-canvas);
+        background-image: var(--bg-canvas-gradient);
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .page {
+        width: 100%;
+        max-width: 680px;
+      }
+
+      .calculator-card {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        padding: 36px 32px 32px;
+      }
+
+      .calculator-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 34%, #ec4899 68%, #10b981 100%);
+      }
+
+      .card-header {
+        margin-bottom: 28px;
+      }
+
+      .card-header h1 {
+        margin: 0 0 6px 0;
+        font-size: clamp(1.5rem, 2.5vw, 1.95rem);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+        color: var(--text-primary);
+        text-wrap: balance;
+      }
+
+      .subtitle {
+        margin: 0;
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 0;
+      }
+
+      .field-group.full-span {
+        grid-column: 1 / -1;
+      }
+
+      .field-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .field-hint {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: var(--text-muted);
+      }
+
+      .input-wrap {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-control);
+        transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .input-wrap:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--focus-ring);
+      }
+
+      .input-wrap.has-error,
+      select.has-error {
+        border-color: var(--error-border);
+      }
+
+      .input-wrap.has-error:focus-within,
+      select.has-error:focus-visible {
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+      }
+
+      .input-adornment {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 13px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-adornment-currency);
+        background-color: var(--bg-adornment-currency);
+        border-right: 1px solid var(--border-subtle);
+        border-top-left-radius: calc(var(--radius-control) - 1px);
+        border-bottom-left-radius: calc(var(--radius-control) - 1px);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+        user-select: none;
+      }
+
+      .input-adornment.suffix {
+        color: var(--text-adornment-rate);
+        background-color: var(--bg-adornment-rate);
+        border-right: none;
+        border-left: 1px solid var(--border-subtle);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: calc(var(--radius-control) - 1px);
+        border-bottom-right-radius: calc(var(--radius-control) - 1px);
+      }
+
+      input[type="number"],
+      input[type="date"],
+      select {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+        font-family: inherit;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        background-color: transparent;
+        border: none;
+        outline: none;
+        font-variant-numeric: tabular-nums;
+        min-width: 0;
+      }
+
+      input[type="number"]::placeholder {
+        color: var(--text-muted);
+        opacity: 0.75;
+      }
+
+      select {
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-control);
+        cursor: pointer;
+        transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      select:focus-visible {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--focus-ring);
+      }
+
+      /* Segmented radio control for Interest Type */
+      fieldset.segmented-fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 0;
+      }
+
+      fieldset.segmented-fieldset legend {
+        padding: 0;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 7px;
+      }
+
+      .segmented-control {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px;
+        padding: 4px;
+        background-color: var(--bg-segment);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-control);
+        min-height: 44px;
+      }
+
+      .segment-option {
+        position: relative;
+      }
+
+      .segment-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        inset: 0;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .segment-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 34px;
+        padding: 6px 10px;
+        border-radius: var(--radius-segment);
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+          color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+        user-select: none;
+      }
+
+      .segment-option input[type="radio"]:checked + label {
+        background: var(--bg-segment-active);
+        color: var(--text-segment-active);
+        box-shadow: var(--shadow-segment);
+      }
+
+      .segment-option input[type="radio"]:focus-visible + label {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+
+      .field-error {
+        margin: 0;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--error-text);
+        line-height: 1.35;
+        min-height: 0;
+      }
+
+      .field-error:empty {
+        display: none;
+      }
+
+      .actions-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 26px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 10px 24px;
+        font-family: inherit;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        border-radius: var(--radius-control);
+        border: 1px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+          transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .btn:active {
+        transform: scale(0.985);
+      }
+
+      .btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--focus-ring);
+      }
+
+      .btn-primary {
+        flex: 1 1 auto;
+        background: var(--accent-gradient);
+        color: var(--accent-text);
+        box-shadow: var(--shadow-btn);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-gradient-hover);
+      }
+
+      .btn-secondary {
+        background-color: var(--bg-subtle);
+        color: var(--text-primary);
+        border-color: var(--border-strong);
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Results Section */
+      .results-section {
+        margin-top: 28px;
+        padding: 24px;
+        background: var(--bg-highlight);
+        border: 1px solid var(--border-highlight);
+        border-radius: 14px;
+        outline: none;
+        transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+          transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 350ms ease;
+      }
+
+      .results-section.is-flashing {
+        background: var(--bg-highlight-flash);
+        box-shadow: 0 0 0 4px var(--focus-ring);
+      }
+
+      @keyframes resultReveal {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .results-section.just-revealed {
+        animation: resultReveal 220ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .results-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-highlight);
+      }
+
+      .results-title {
+        margin: 0;
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .results-meta {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 24px;
+        padding: 20px 0;
+      }
+
+      .metric-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .metric-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+
+      .metric-value {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.015em;
+        overflow-wrap: anywhere;
+      }
+
+      .metric-value.metric-total {
+        font-size: 1.55rem;
+        color: var(--color-total);
+      }
+
+      .metric-value.metric-interest {
+        color: var(--color-interest);
+      }
+
+      .metric-value.metric-principal {
+        color: var(--color-principal);
+      }
+
+      .metric-value.metric-period {
+        color: var(--color-period);
+      }
+
+      .metric-sub {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .breakdown-bar-wrap {
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-highlight);
+      }
+
+      .breakdown-bar {
+        display: flex;
+        height: 10px;
+        width: 100%;
+        border-radius: 999px;
+        overflow: hidden;
+        background-color: var(--bar-track);
+      }
+
+      .bar-seg-principal {
+        height: 100%;
+        background: var(--bar-principal);
+        transition: width 260ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .bar-seg-interest {
+        height: 100%;
+        background: var(--bar-interest);
+        transition: width 260ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .breakdown-legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 6px 16px;
+        margin-top: 8px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .legend-principal {
+        color: var(--color-principal);
+      }
+
+      .legend-interest {
+        color: var(--color-interest);
+      }
+
+      .formula-block {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        background-color: var(--bg-formula);
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .formula-heading {
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+      }
+
+      .formula-symbolic {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .formula-substituted {
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        line-height: 1.65;
+        color: var(--text-primary);
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+      }
+
+      .formula-substituted .formula-line + .formula-line {
+        margin-top: 4px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 16px 12px;
+          align-items: flex-start;
+        }
+
+        .calculator-card {
+          padding: 24px 18px;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .metrics-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .actions-row {
+          flex-direction: column-reverse;
+          align-items: stretch;
+        }
+
+        .results-section {
+          padding: 18px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .results-section,
+        .results-section.just-revealed,
+        .btn,
+        .input-wrap,
+        select,
+        .segment-option label,
+        .bar-seg-principal,
+        .bar-seg-interest {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="calculator-card" aria-labelledby="app-title">
+        <header class="card-header">
+          <h1 id="app-title">Interest Calculator</h1>
+          <p class="subtitle">
+            Calculate simple or compound interest across currencies and exact date ranges.
+          </p>
+        </header>
+
+        <form id="calculator-form" novalidate>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label" for="principal">Principal amount</label>
+              <div class="input-wrap" id="principal-wrap">
+                <span class="input-adornment" id="currency-prefix" aria-hidden="true">$</span>
+                <input
+                  id="principal"
+                  name="principal"
+                  type="number"
+                  step="any"
+                  min="0"
+                  inputmode="decimal"
+                  placeholder="10000"
+                  aria-describedby="principal-error"
+                />
+              </div>
+              <p class="field-error" id="principal-error" role="alert"></p>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="currency">Currency</label>
+              <select id="currency" name="currency">
+                <option value="USD" selected>USD — US Dollar</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="GBP">GBP — British Pound</option>
+                <option value="QAR">QAR — Qatari Riyal</option>
+                <option value="AED">AED — UAE Dirham</option>
+                <option value="SAR">SAR — Saudi Riyal</option>
+                <option value="KWD">KWD — Kuwaiti Dinar</option>
+                <option value="INR">INR — Indian Rupee</option>
+                <option value="PKR">PKR — Pakistani Rupee</option>
+                <option value="EGP">EGP — Egyptian Pound</option>
+                <option value="JPY">JPY — Japanese Yen</option>
+                <option value="CAD">CAD — Canadian Dollar</option>
+                <option value="AUD">AUD — Australian Dollar</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="rate">Annual interest rate</label>
+              <div class="input-wrap" id="rate-wrap">
+                <input
+                  id="rate"
+                  name="rate"
+                  type="number"
+                  step="any"
+                  min="0"
+                  inputmode="decimal"
+                  placeholder="5.5"
+                  aria-describedby="rate-error"
+                />
+                <span class="input-adornment suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-error" id="rate-error" role="alert"></p>
+            </div>
+
+            <fieldset class="segmented-fieldset">
+              <legend>Interest type</legend>
+              <div class="segmented-control">
+                <div class="segment-option">
+                  <input
+                    type="radio"
+                    id="type-simple"
+                    name="interestType"
+                    value="simple"
+                    checked
+                  />
+                  <label for="type-simple">Simple Interest</label>
+                </div>
+                <div class="segment-option">
+                  <input
+                    type="radio"
+                    id="type-compound"
+                    name="interestType"
+                    value="compound"
+                  />
+                  <label for="type-compound">Compound Interest</label>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="field-group full-span hidden" id="frequency-group">
+              <label class="field-label" for="frequency">
+                Compounding frequency
+                <span class="field-hint" id="frequency-hint">12 periods per year</span>
+              </label>
+              <select id="frequency" name="frequency">
+                <option value="1">Annually</option>
+                <option value="2">Semi-annually</option>
+                <option value="4">Quarterly</option>
+                <option value="12" selected>Monthly</option>
+                <option value="365">Daily</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="start-date">Start date</label>
+              <div class="input-wrap" id="start-date-wrap">
+                <input
+                  id="start-date"
+                  name="startDate"
+                  type="date"
+                  aria-describedby="start-date-error"
+                />
+              </div>
+              <p class="field-error" id="start-date-error" role="alert"></p>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="end-date">End date</label>
+              <div class="input-wrap" id="end-date-wrap">
+                <input
+                  id="end-date"
+                  name="endDate"
+                  type="date"
+                  aria-describedby="end-date-error"
+                />
+              </div>
+              <p class="field-error" id="end-date-error" role="alert"></p>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button type="submit" class="btn btn-primary" id="calculate-btn">Calculate</button>
+            <button type="button" class="btn btn-secondary" id="reset-btn">Reset</button>
+          </div>
+        </form>
+
+        <section
+          id="results-section"
+          class="results-section hidden"
+          aria-live="polite"
+          aria-labelledby="results-title"
+          tabindex="-1"
+        >
+          <div class="results-header">
+            <h2 class="results-title" id="results-title">Calculation Summary</h2>
+            <div class="results-meta" id="results-meta"></div>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <span class="metric-label">Total amount</span>
+              <span class="metric-value metric-total" id="res-total"></span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Interest earned</span>
+              <span class="metric-value metric-interest" id="res-interest"></span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Principal</span>
+              <span class="metric-value metric-principal" id="res-principal"></span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Time period</span>
+              <span class="metric-value metric-period" id="res-days"></span>
+              <span class="metric-sub" id="res-years"></span>
+            </div>
+          </div>
+
+          <div class="breakdown-bar-wrap">
+            <div class="breakdown-bar" aria-hidden="true">
+              <div class="bar-seg-principal" id="bar-principal" style="width: 100%"></div>
+              <div class="bar-seg-interest" id="bar-interest" style="width: 0%"></div>
+            </div>
+            <div class="breakdown-legend">
+              <span class="legend-principal" id="legend-principal"></span>
+              <span class="legend-interest" id="legend-interest"></span>
+            </div>
+          </div>
+
+          <div class="formula-block">
+            <div class="formula-heading">Formula applied</div>
+            <div class="formula-symbolic" id="formula-symbolic"></div>
+            <div class="formula-substituted" id="formula-substituted"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const FREQUENCY_LABELS = {
+          1: "Annually",
+          2: "Semi-annually",
+          4: "Quarterly",
+          12: "Monthly",
+          365: "Daily",
+        };
+
+        const FREQUENCY_HINTS = {
+          1: "1 period per year",
+          2: "2 periods per year",
+          4: "4 periods per year",
+          12: "12 periods per year",
+          365: "365 periods per year",
+        };
+
+        const MS_PER_DAY = 86400000;
+
+        const form = document.getElementById("calculator-form");
+        const principalInput = document.getElementById("principal");
+        const principalWrap = document.getElementById("principal-wrap");
+        const principalError = document.getElementById("principal-error");
+
+        const currencySelect = document.getElementById("currency");
+        const currencyPrefix = document.getElementById("currency-prefix");
+
+        const rateInput = document.getElementById("rate");
+        const rateWrap = document.getElementById("rate-wrap");
+        const rateError = document.getElementById("rate-error");
+
+        const typeSimpleRadio = document.getElementById("type-simple");
+        const typeCompoundRadio = document.getElementById("type-compound");
+        const frequencyGroup = document.getElementById("frequency-group");
+        const frequencySelect = document.getElementById("frequency");
+        const frequencyHint = document.getElementById("frequency-hint");
+
+        const startDateInput = document.getElementById("start-date");
+        const startDateWrap = document.getElementById("start-date-wrap");
+        const startDateError = document.getElementById("start-date-error");
+
+        const endDateInput = document.getElementById("end-date");
+        const endDateWrap = document.getElementById("end-date-wrap");
+        const endDateError = document.getElementById("end-date-error");
+
+        const resetBtn = document.getElementById("reset-btn");
+
+        const resultsSection = document.getElementById("results-section");
+        const resultsMeta = document.getElementById("results-meta");
+        const resTotal = document.getElementById("res-total");
+        const resInterest = document.getElementById("res-interest");
+        const resPrincipal = document.getElementById("res-principal");
+        const resDays = document.getElementById("res-days");
+        const resYears = document.getElementById("res-years");
+        const barPrincipal = document.getElementById("bar-principal");
+        const barInterest = document.getElementById("bar-interest");
+        const legendPrincipal = document.getElementById("legend-principal");
+        const legendInterest = document.getElementById("legend-interest");
+        const formulaSymbolic = document.getElementById("formula-symbolic");
+        const formulaSubstituted = document.getElementById("formula-substituted");
+
+        let lastResult = null;
+        let flashTimeoutId = null;
+
+        function getCurrencySymbol(currencyCode) {
+          try {
+            const parts = new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: currencyCode,
+              currencyDisplay: "symbol",
+            }).formatToParts(0);
+            const symbolPart = parts.find(function (part) {
+              return part.type === "currency";
+            });
+            return symbolPart ? symbolPart.value : currencyCode;
+          } catch (_err) {
+            return currencyCode;
+          }
+        }
+
+        function formatCurrency(amount, currencyCode) {
+          const safeAmount = Math.abs(amount) < 1e-12 ? 0 : amount;
+          return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: currencyCode,
+            currencyDisplay: "symbol",
+          }).format(safeAmount);
+        }
+
+        function formatDecimalClean(num, maxFractionDigits) {
+          const safe = Math.abs(num) < 1e-12 ? 0 : num;
+          return Number(safe.toFixed(maxFractionDigits)).toString();
+        }
+
+        function parseIsoDateUtc(value) {
+          if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return null;
+          }
+          const parts = value.split("-").map(Number);
+          const year = parts[0];
+          const month = parts[1];
+          const day = parts[2];
+          const utcMs = Date.UTC(year, month - 1, day);
+          const check = new Date(utcMs);
+          if (
+            check.getUTCFullYear() !== year ||
+            check.getUTCMonth() !== month - 1 ||
+            check.getUTCDate() !== day
+          ) {
+            return null;
+          }
+          return utcMs;
+        }
+
+        function setFieldError(inputEl, wrapEl, errorEl, message) {
+          errorEl.textContent = message;
+          if (message) {
+            wrapEl.classList.add("has-error");
+            inputEl.setAttribute("aria-invalid", "true");
+          } else {
+            wrapEl.classList.remove("has-error");
+            inputEl.removeAttribute("aria-invalid");
+          }
+        }
+
+        function clearAllErrors() {
+          setFieldError(principalInput, principalWrap, principalError, "");
+          setFieldError(rateInput, rateWrap, rateError, "");
+          setFieldError(startDateInput, startDateWrap, startDateError, "");
+          setFieldError(endDateInput, endDateWrap, endDateError, "");
+        }
+
+        function updateCurrencyPrefix() {
+          const code = currencySelect.value;
+          const symbol = getCurrencySymbol(code);
+          currencyPrefix.textContent = symbol;
+          currencyPrefix.title = code;
+        }
+
+        function updateFrequencyVisibility() {
+          const isCompound = typeCompoundRadio.checked;
+          if (isCompound) {
+            frequencyGroup.classList.remove("hidden");
+          } else {
+            frequencyGroup.classList.add("hidden");
+          }
+        }
+
+        function updateFrequencyHint() {
+          const n = Number(frequencySelect.value);
+          frequencyHint.textContent = FREQUENCY_HINTS[n] || "";
+        }
+
+        function triggerHighlight() {
+          resultsSection.classList.remove("just-revealed");
+          resultsSection.classList.remove("is-flashing");
+          void resultsSection.offsetWidth;
+          resultsSection.classList.add("just-revealed");
+          resultsSection.classList.add("is-flashing");
+          if (flashTimeoutId !== null) {
+            window.clearTimeout(flashTimeoutId);
+          }
+          flashTimeoutId = window.setTimeout(function () {
+            resultsSection.classList.remove("is-flashing");
+          }, 420);
+        }
+
+        function renderResults(animate) {
+          if (!lastResult) {
+            return;
+          }
+
+          const currency = currencySelect.value;
+          const P = lastResult.principal;
+          const r = lastResult.rateDecimal;
+          const days = lastResult.days;
+          const years = lastResult.years;
+          const interest = lastResult.interest;
+          const total = lastResult.total;
+          const type = lastResult.interestType;
+          const n = lastResult.compoundingPeriods;
+
+          const pFormatted = formatCurrency(P, currency);
+          const iFormatted = formatCurrency(interest, currency);
+          const aFormatted = formatCurrency(total, currency);
+
+          resPrincipal.textContent = pFormatted;
+          resInterest.textContent = iFormatted;
+          resTotal.textContent = aFormatted;
+
+          const dayWord = days === 1 ? "day" : "days";
+          resDays.textContent = days.toLocaleString("en-US") + " " + dayWord;
+
+          const yearsClean = formatDecimalClean(years, 4);
+          const yearWord = Number(yearsClean) === 1 ? "year" : "years";
+          resYears.textContent = yearsClean + " " + yearWord + " (" + days + " ÷ 365)";
+
+          const safeTotal = total > 0 ? total : 1;
+          const principalPct = Math.max(0, Math.min(100, (P / safeTotal) * 100));
+          const interestPct = Math.max(0, 100 - principalPct);
+          barPrincipal.style.width = principalPct.toFixed(2) + "%";
+          barInterest.style.width = interestPct.toFixed(2) + "%";
+          legendPrincipal.textContent = "Principal: " + principalPct.toFixed(1) + "%";
+          legendInterest.textContent = "Interest: " + interestPct.toFixed(1) + "%";
+
+          resultsMeta.replaceChildren();
+          const typeSpan = document.createElement("span");
+          typeSpan.textContent =
+            type === "compound"
+              ? "Compound Interest (" + (FREQUENCY_LABELS[n] || n + "/yr") + ")"
+              : "Simple Interest";
+          const sepSpan = document.createElement("span");
+          sepSpan.setAttribute("aria-hidden", "true");
+          sepSpan.textContent = "·";
+          const curSpan = document.createElement("span");
+          curSpan.textContent = currency;
+          resultsMeta.append(typeSpan, sepSpan, curSpan);
+
+          const rDisplay = formatDecimalClean(r, 10);
+          const tFormulaPart = "(" + days + " / 365)";
+
+          formulaSubstituted.replaceChildren();
+
+          if (type === "simple") {
+            formulaSymbolic.textContent = "I = P × r × t    ·    A = P + I";
+
+            const line1 = document.createElement("div");
+            line1.className = "formula-line";
+            line1.textContent =
+              "I = " +
+              pFormatted +
+              " × " +
+              rDisplay +
+              " × " +
+              tFormulaPart +
+              " = " +
+              iFormatted;
+
+            const line2 = document.createElement("div");
+            line2.className = "formula-line";
+            line2.textContent = "A = " + pFormatted + " + " + iFormatted + " = " + aFormatted;
+
+            formulaSubstituted.append(line1, line2);
+          } else {
+            formulaSymbolic.textContent = "A = P × (1 + r / n)^(n × t)    ·    I = A − P";
+
+            const line1 = document.createElement("div");
+            line1.className = "formula-line";
+            line1.textContent =
+              "A = " +
+              pFormatted +
+              " × (1 + " +
+              rDisplay +
+              " / " +
+              n +
+              ")^(" +
+              n +
+              " × " +
+              tFormulaPart +
+              ") = " +
+              aFormatted;
+
+            const line2 = document.createElement("div");
+            line2.className = "formula-line";
+            line2.textContent = "I = " + aFormatted + " − " + pFormatted + " = " + iFormatted;
+
+            formulaSubstituted.append(line1, line2);
+          }
+
+          resultsSection.classList.remove("hidden");
+          if (animate) {
+            triggerHighlight();
+          }
+        }
+
+        function validateAndCalculate(event) {
+          event.preventDefault();
+          clearAllErrors();
+
+          let firstInvalidInput = null;
+
+          const principalRaw = principalInput.value.trim();
+          const principalVal = Number(principalRaw);
+          if (principalRaw === "") {
+            setFieldError(
+              principalInput,
+              principalWrap,
+              principalError,
+              "Please enter a principal amount."
+            );
+            firstInvalidInput = firstInvalidInput || principalInput;
+          } else if (!Number.isFinite(principalVal) || principalVal <= 0) {
+            setFieldError(
+              principalInput,
+              principalWrap,
+              principalError,
+              "Principal amount must be greater than 0."
+            );
+            firstInvalidInput = firstInvalidInput || principalInput;
+          }
+
+          const rateRaw = rateInput.value.trim();
+          const rateVal = Number(rateRaw);
+          if (rateRaw === "") {
+            setFieldError(
+              rateInput,
+              rateWrap,
+              rateError,
+              "Please enter an annual interest rate."
+            );
+            firstInvalidInput = firstInvalidInput || rateInput;
+          } else if (!Number.isFinite(rateVal) || rateVal < 0) {
+            setFieldError(
+              rateInput,
+              rateWrap,
+              rateError,
+              "Interest rate must be 0% or higher."
+            );
+            firstInvalidInput = firstInvalidInput || rateInput;
+          }
+
+          const startRaw = startDateInput.value;
+          const startUtc = parseIsoDateUtc(startRaw);
+          if (!startRaw) {
+            setFieldError(
+              startDateInput,
+              startDateWrap,
+              startDateError,
+              "Please select a start date."
+            );
+            firstInvalidInput = firstInvalidInput || startDateInput;
+          } else if (startUtc === null) {
+            setFieldError(
+              startDateInput,
+              startDateWrap,
+              startDateError,
+              "Please enter a valid start date."
+            );
+            firstInvalidInput = firstInvalidInput || startDateInput;
+          }
+
+          const endRaw = endDateInput.value;
+          const endUtc = parseIsoDateUtc(endRaw);
+          if (!endRaw) {
+            setFieldError(
+              endDateInput,
+              endDateWrap,
+              endDateError,
+              "Please select an end date."
+            );
+            firstInvalidInput = firstInvalidInput || endDateInput;
+          } else if (endUtc === null) {
+            setFieldError(
+              endDateInput,
+              endDateWrap,
+              endDateError,
+              "Please enter a valid end date."
+            );
+            firstInvalidInput = firstInvalidInput || endDateInput;
+          } else if (startUtc !== null && endUtc < startUtc) {
+            setFieldError(
+              endDateInput,
+              endDateWrap,
+              endDateError,
+              "End date cannot be earlier than the start date."
+            );
+            firstInvalidInput = firstInvalidInput || endDateInput;
+          }
+
+          if (firstInvalidInput) {
+            lastResult = null;
+            resultsSection.classList.add("hidden");
+            firstInvalidInput.focus();
+            return;
+          }
+
+          const days = Math.round((endUtc - startUtc) / MS_PER_DAY);
+          const years = days / 365;
+          const rateDecimal = rateVal / 100;
+          const interestType = typeCompoundRadio.checked ? "compound" : "simple";
+          const compoundingPeriods = Number(frequencySelect.value);
+
+          let interest = 0;
+          let total = principalVal;
+
+          if (days === 0 || rateDecimal === 0) {
+            interest = 0;
+            total = principalVal;
+          } else if (interestType === "simple") {
+            interest = principalVal * rateDecimal * years;
+            total = principalVal + interest;
+          } else {
+            const growthFactor = Math.expm1(
+              compoundingPeriods * years * Math.log1p(rateDecimal / compoundingPeriods)
+            );
+            interest = principalVal * growthFactor;
+            total = principalVal + interest;
+          }
+
+          if (!Number.isFinite(interest) || !Number.isFinite(total)) {
+            setFieldError(
+              principalInput,
+              principalWrap,
+              principalError,
+              "The resulting calculation exceeds supported numeric limits."
+            );
+            lastResult = null;
+            resultsSection.classList.add("hidden");
+            principalInput.focus();
+            return;
+          }
+
+          lastResult = {
+            principal: principalVal,
+            rateDecimal: rateDecimal,
+            days: days,
+            years: years,
+            interestType: interestType,
+            compoundingPeriods: compoundingPeriods,
+            interest: interest,
+            total: total,
+          };
+
+          renderResults(true);
+        }
+
+        function handleReset() {
+          form.reset();
+          currencySelect.value = "USD";
+          typeSimpleRadio.checked = true;
+          frequencySelect.value = "12";
+          updateCurrencyPrefix();
+          updateFrequencyVisibility();
+          updateFrequencyHint();
+          clearAllErrors();
+          lastResult = null;
+          resultsSection.classList.add("hidden");
+          resultsSection.classList.remove("just-revealed", "is-flashing");
+          principalInput.focus();
+        }
+
+        form.addEventListener("submit", validateAndCalculate);
+        resetBtn.addEventListener("click", handleReset);
+
+        currencySelect.addEventListener("change", function () {
+          updateCurrencyPrefix();
+          if (lastResult) {
+            renderResults(false);
+          }
+        });
+
+        function recalculateIfShown() {
+          if (!lastResult) {
+            return;
+          }
+          validateAndCalculate({
+            preventDefault: function () {},
+          });
+        }
+
+        typeSimpleRadio.addEventListener("change", function () {
+          updateFrequencyVisibility();
+          recalculateIfShown();
+        });
+        typeCompoundRadio.addEventListener("change", function () {
+          updateFrequencyVisibility();
+          recalculateIfShown();
+        });
+        frequencySelect.addEventListener("change", function () {
+          updateFrequencyHint();
+          recalculateIfShown();
+        });
+
+        principalInput.addEventListener("input", function () {
+          setFieldError(principalInput, principalWrap, principalError, "");
+        });
+        rateInput.addEventListener("input", function () {
+          setFieldError(rateInput, rateWrap, rateError, "");
+        });
+        startDateInput.addEventListener("input", function () {
+          setFieldError(startDateInput, startDateWrap, startDateError, "");
+          if (endDateError.textContent && endDateInput.value >= startDateInput.value) {
+            setFieldError(endDateInput, endDateWrap, endDateError, "");
+          }
+        });
+        endDateInput.addEventListener("input", function () {
+          setFieldError(endDateInput, endDateWrap, endDateError, "");
+        });
+
+        updateCurrencyPrefix();
+        updateFrequencyVisibility();
+        updateFrequencyHint();
+      })();
+    </script>
+  </body>
+</html>

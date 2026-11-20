@@ -1,0 +1,6 @@
+{
+  "name": "Interest Calculator",
+  "description": "A self-contained simple and compound interest calculator supporting 13 currencies, exact date ranges, and automatic light/dark mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
